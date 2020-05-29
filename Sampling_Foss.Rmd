@@ -1,0 +1,25 @@
+---
+title: "Sampling_Foss"
+output: html_document
+---
+```{r}
+sfoss <- read.table("obtaining_LONI_outputs\\shreya_foss_errorfixed.log", head = TRUE)
+
+library(FossilSim)
+
+sampFBD <- function(n_extant, n_trees, df,  mu, lambda, psi, rows, mers) {
+  m1 <- c(df [rows, mu]) ## from data frame, get values of mu from some row
+  # print(m1)
+  l1 <- c(df [rows, lambda])
+  p1 <- c(df [rows, psi]) 
+  modelledfoss <- sim.fbd.rateshift.taxa(n_extant, n_trees, l1, m1, p1, mers, complete = TRUE)
+    return(modelledfoss)
+    
+}
+
+
+sampFBD(666, 1, sfoss, "mu", "lambda", "psi.1.", c(1), c(61)) #sfoss containing the rows in mu, lambda, etc. 
+
+#sfoss$psi.1.
+#View(sfoss$psi.1.)
+```
