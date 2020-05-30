@@ -1,0 +1,86 @@
+---
+title: "sampling_foss"
+output: html_document
+---
+##Reads logfile
+```{r}
+foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
+head(foss_data)
+View(foss_data) ## for view
+```
+
+##Sampling
+```{r}
+library(FossilSim)
+foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
+
+foss_function <- function(data_frame, arg_1, arg_2) ## data_frame: my dataset(.log file), arg : which row
+{
+  ## for arg1
+  m1 <- data_frame$mu[arg_1]  ## mu value stored in m1
+  l1 <- data_frame$lambda[arg_1] ## lamda value stored in m1
+  p1 <- data_frame$psi.1.[arg_1]  ## psi value stored in p1
+  
+  ## for arg2
+  m2 <- data_frame$mu[arg_2]  
+  l2 <- data_frame$lambda[arg_2] 
+  p2 <- data_frame$psi.1.[arg_2]
+  
+
+  
+  ## store mu, lamda and psi in vector
+  mu_value <- c(m1,m2)
+  lambda_value <- c(l1,l2)
+  psi_value <- c(p1,p2)
+  
+  all_values <- c(mu_value,lambda_value,psi_value)
+  
+  ## n = 666 (given)
+  ## numbsim =  1
+  ## from LONI times = (29,70) 
+  tree <- sim.fbd.rateshift.taxa(666,1,lambda = lambda_value, mu=mu_value, psi=psi_value, times=c(29,70), complete = FALSE )
+  {
+    return(rangeplot.asymmetric(tree[[1]])) ## draws a sim.fbd.rateshift.taxa tree
+  }
+  
+return(all_values) # returns all the values
+}
+# m = 151
+# for(i in 1:m) {
+#   foss_function(foss_data,i,i)
+# }
+foss_function(foss_data,120,20)
+```
+
+
+## All mu values 1:151
+```{r}
+# m = 151 # we got 151 rows in log file
+# for (i in 1:m) {
+#   print(foss_data$mu[i])
+# }
+```
+```{r}
+# library(FossilSim)
+# 
+# foss_function <- function(data_frame, arg)
+# {
+#   mi <- data_frame$mu[arg]  
+#   li <- data_frame$lambda[arg] 
+#   pi <- data_frame$psi.1.[arg]
+#   
+#   all_values <- c(mi,li,pi)
+#   
+#   foss_model <- sim.fbd.rateshift.taxa(666,1,lambda = li, mu=mi, psi=pi, times=29, complete = FALSE ) 
+#   {
+#     return(rangeplot.asymmetric(foss_model[[1]]))
+#   }
+#   
+#   return(all_values)
+# }
+# m = 151 ## we have 151 rows in log file
+# for(i in 1:m) {
+#   foss_function(foss_data,i)
+# }
+```
+
