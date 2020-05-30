@@ -4,7 +4,7 @@ output: html_document
 ---
 ##Reads logfile
 ```{r}
-foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
+foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
 head(foss_data)
 View(foss_data) ## for view
 ```
@@ -12,7 +12,7 @@ View(foss_data) ## for view
 ##Sampling
 ```{r}
 library(FossilSim)
-foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
+foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
 
 foss_function <- function(data_frame, arg_1, arg_2) ## data_frame: my dataset(.log file), arg : which row
 {
@@ -22,9 +22,9 @@ foss_function <- function(data_frame, arg_1, arg_2) ## data_frame: my dataset(.l
   p1 <- data_frame$psi.1.[arg_1]  ## psi value stored in p1
   
   ## for arg2
-  m2 <- data_frame$mu[arg_2]  
-  l2 <- data_frame$lambda[arg_2] 
-  p2 <- data_frame$psi.1.[arg_2]
+  m2 <- data_frame$mu[arg_1]  
+  l2 <- data_frame$lambda[arg_1] 
+  p2 <- data_frame$psi.2.[arg_1]
   
 
   
