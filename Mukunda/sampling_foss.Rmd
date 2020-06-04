@@ -45,42 +45,26 @@ foss_function <- function(data_frame, arg_1, arg_2) ## data_frame: my dataset(.l
   
 return(all_values) # returns all the values
 }
-# m = 151
-# for(i in 1:m) {
-#   foss_function(foss_data,i,i)
-# }
 foss_function(foss_data,120,20)
 ```
 
 
-## All mu values 1:151
 ```{r}
-# m = 151 # we got 151 rows in log file
-# for (i in 1:m) {
-#   print(foss_data$mu[i])
-# }
-```
-```{r}
-# library(FossilSim)
-# 
-# foss_function <- function(data_frame, arg)
-# {
-#   mi <- data_frame$mu[arg]  
-#   li <- data_frame$lambda[arg] 
-#   pi <- data_frame$psi.1.[arg]
-#   
-#   all_values <- c(mi,li,pi)
-#   
-#   foss_model <- sim.fbd.rateshift.taxa(666,1,lambda = li, mu=mi, psi=pi, times=29, complete = FALSE ) 
-#   {
-#     return(rangeplot.asymmetric(foss_model[[1]]))
-#   }
-#   
-#   return(all_values)
-# }
-# m = 151 ## we have 151 rows in log file
-# for(i in 1:m) {
-#   foss_function(foss_data,i)
-# }
+library(FossilSim)
+foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
+
+foss_function <- function(n_extant, n_trees, data_frame,  mu, lambda, psi, rows, times) {
+  
+  mi <- c(foss_data [rows, mu])
+  li <- c(foss_data [rows, lambda])
+  pi <- c(foss_data [rows, psi]) 
+  
+ tree <- sim.fbd.rateshift.taxa(n_extant, n_trees, li, mi, pi, times, complete = TRUE)
+ {
+   return(rangeplot.asymmetric(tree[[1]]))
+ } 
+  # return(foss_model)
+}
+foss_function(666,1, foss_data, mu = "mu", lambda = "lambda", psi = "psi.1.", c(10,12) ,times = c(29,70) )
 ```
 
