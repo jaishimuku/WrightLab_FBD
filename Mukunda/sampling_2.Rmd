@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r}
-foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
+foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
 ```
 
 ```{r}
