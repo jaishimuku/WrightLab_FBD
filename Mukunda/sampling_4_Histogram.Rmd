@@ -1,0 +1,130 @@
+---
+title: "sampling_4_Histogram"
+output: html_document
+---
+
+```{r}
+foss_data <- read.table("/Users/muku/Documents/WrightLab/Sampling/mukunda_foss.log", sep = '\t',  head = TRUE)
+```
+
+```{r}
+n.ages <- function(tree){
+  depth = ape::node.depth.edgelength(tree)
+  node.ages = max(depth) - depth
+  names(node.ages) <- 1:(tree$Nnode+length(tree$tip))
+  # adding possible offset if tree fully extinct
+  if(!is.null(tree$root.time)) node.ages = node.ages + tree$root.time - max(node.ages)
+  return(node.ages)
+}
+```
+
+```{r}
+sfbdrt <- function (n, numbsim, lambda, mu, psi, times, complete = FALSE) 
+{
+  if (length(lambda) != length(times)) 
+    stop("Length mismatch between rate shift times and birth rates")
+  if (length(mu) != length(times)) 
+    stop("Length mismatch between rate shift times and death rates")
+  if (length(psi) != length(times)) 
+    stop("Length mismatch between rate shift times and sampling rates")
+  trees = TreeSim::sim.rateshift.taxa(n, numbsim, lambda, 
+                                      mu, rep(1, length(times)), times, complete = TRUE)
+  for (i in 1:length(trees)) {
+    t = trees[[i]]
+    origin = max(n.ages(t)) + t$root.edge
+    horizons = c(times, origin)
+    f <- sim.fossils.intervals(tree = t, interval.ages = horizons, 
+                               rates = psi)
+    tree = SAtree.from.fossils(t, f)
+    node.ages = n.ages(tree)
+    if (complete == FALSE) {
+      fossil.tips = is.extinct(tree, tol = 1e-06)
+      sa.tips = tree$tip.label[tree$edge[, 2][(tree$edge[, 
+                                                         2] %in% 1:length(tree$tip.label)) & (tree$edge.length == 
+                                                                                                0)]]
+      unsampled.tips = fossil.tips[!(fossil.tips %in% 
+                                       sa.tips)]
+      tree = ape::drop.tip(tree, unsampled.tips)
+      node.ages = n.ages(tree)
+    }
+    trees[[i]] = tree
+    trees[[i]]$root.edge = origin - max(node.ages)
+    trees[[i]] = SAtree(trees[[i]], complete)
+  }
+  
+  f$h <- (f$hmin + f$hmax)/2
+  
+  return(list(f, trees))
+}
+```
+
+```{r}
+library(FossilSim)
+library(tidyverse)
+foss_sample <- function(n_extant, n_trees, data_frame, mu, lambda, psi, row, mers)
+{
+  
+  max_num <- max(c(length(mu), length(lambda), length(psi)))
+  
+  if(length(mu) == 1) 
+        {  
+          mi <- rep(data_frame[row, mu], times = max_num)
+      } else {
+          mi <- c()
+          for (i in mu) {
+            mi <- append(mi, data_frame[row,i])
+          }
+      }
+
+  if(length(lambda) == 1) 
+        {  
+          li <- rep(data_frame[row, lambda], times = max_num)
+      } else {
+          li <- c()
+          for (i in lambda) {
+            li <- append(li, data_frame[row,i])
+          }
+      }
+  
+  if(length(psi) == 1) 
+        {  
+          pi <- rep(data_frame[row, psi], times = max_num)
+      } else {
+          pi <- c()
+          for (i in psi) {
+            pi <- append(pi, data_frame[row,i])
+          }
+      }
+ 
+  my_fuction <- sfbdrt(n_extant, n_trees, li, mi, pi, times = mers, complete = TRUE)
+   return(my_fuction)
+}
+```
+ 
+Example list generation by SFB. 
+```{r}
+my_tree <- foss_sample(666, 1, foss_data, "mu", "lambda", c("psi.1.", "psi.2.", "psi.3."), 120, c(0, 29, 70))
+View(my_tree)
+```
+
+```{r}
+num_sim <- 100 
+sim_output <- rep(NA, num_sim)
+
+for (i in 1:num_sim) {
+  my_tree <- foss_sample(666, 1, foss_data, "mu", "lambda", c("psi.1.", "psi.2.", "psi.3."), 10, c(0, 29, 70))
+  
+  origin_time <- tree.max(my_tree[[2]][[1]])
+  sim_output[i] <- origin_time
+}
+my_dataframe <- data.frame(sim_output)
+```
+
+
+```{r}
+ggplot(my_dataframe, aes(sim_output)) + 
+  geom_histogram(binwidth = 20, color = "black", fill = "purple") +  
+  scale_x_reverse() +
+  labs( x = "Million of Years Ago ---->", y= "Samples ---->") + 
+  geom_vline(xintercept = 131, color = "red")  
+```
