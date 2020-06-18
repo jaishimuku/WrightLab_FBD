@@ -4,16 +4,19 @@ output: html_document
 ---
 
 ```{r}
+foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
+```
+
+```{r}
+library(FossilSim)
+library(tidyverse)
 foss_sample <- function(n_extant, n_trees, data_frame, mu, lambda, psi, row, mers)
 {
-  length_mu <- length(c(mu))
-  length_la <- length(c(lambda))
-  length_psi <- length(c(psi))
   
-  max_num <- max(c(length_mu, length_la, length_psi))
+  max_num <- max(c(length(mu), length(lambda), length(psi)))
   
   
-      if(length(mu) == 1) 
+  if(length(mu) == 1) 
         {  
           mi <- rep(data_frame[row, mu], times = max_num)
       } else {
@@ -43,11 +46,12 @@ foss_sample <- function(n_extant, n_trees, data_frame, mu, lambda, psi, row, mer
           }
       }
  
-  my_fuction <- sim.fbd.rateshift.taxa(n_extant, n_trees, mi, li, pi, times = mers, complete = TRUE)
+  my_fuction <- sim.fbd.rateshift.taxa(n_extant, n_trees, li,mi, pi, times = mers, complete = TRUE)
    return(my_fuction)
 }
-library(FossilSim)
-library(tidyverse)
-foss_data <- read.table("mukunda_foss.log", sep = '\t',  head = TRUE)
-mySample <- foss_sample(666,1, foss_data, "mu", "lambda", c("psi.1.","psi.2.", "psi.3."), c(12), c(0,29,70)) 
+```
+
+```{r}
+mySample <- foss_sample(666,1, foss_data, "mu", "lambda", c("psi.1.","psi.2.", "psi.3."), 150, c(0,29,70)) 
+View(mySample)
 ```
